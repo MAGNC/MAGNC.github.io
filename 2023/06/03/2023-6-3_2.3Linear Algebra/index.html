@@ -1,0 +1,364 @@
+<!DOCTYPE html><html lang="en" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Linear Algebra with pytorch | Spencer</title><meta name="author" content="Spencer"><meta name="copyright" content="Spencer"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="2.3.1 Scalars12345import torchx &amp;#x3D; torch.tensor(3.0)y &amp;#x3D; torch.tensor(2.0)x + y, x * y, x &amp;#x2F; y, x ** y (tensor(5.), tensor(6.), tensor(1.5000), tensor(9."><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://www.mathming.ltd/2023/06/03/2023-6-3_2.3Linear%20Algebra/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><meta/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: {"defaultEncoding":1,"translateDelay":10,"msgToTraditionalChinese":"繁","msgToSimplifiedChinese":"簡"},
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: 'Copy successfully',
+    error: 'Copy error',
+    noSupport: 'The browser does not support'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: 'days',
+  date_suffix: {
+    just: 'Just',
+    min: 'minutes ago',
+    hour: 'hours ago',
+    day: 'days ago',
+    month: 'months ago'
+  },
+  copyright: {"limitCount":50,"languages":{"author":"Author: Spencer","link":"Link: ","source":"Source: Spencer","info":"Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source."}},
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Linear Algebra with pytorch',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-07-09 00:07:58'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.2.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">Articles</div><div class="length-num">127</div></a><a href="/tags/"><div class="headline">Tags</div><div class="length-num">46</div></a><a href="/categories/"><div class="headline">Categories</div><div class="length-num">25</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/gallery/"><i class="fa-fw fas fa-gallery"></i><span> Gallery</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background-image: url('https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1')"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">Spencer</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page group" href="javascript:void(0);"><i class="fa-fw fas fa-list"></i><span> List</span><i class="fas fa-chevron-down"></i></a><ul class="menus_item_child"><li><a class="site-page child" href="/music/"><i class="fa-fw fas fa-music"></i><span> Music</span></a></li><li><a class="site-page child" href="/movies/"><i class="fa-fw fas fa-video"></i><span> Movie</span></a></li></ul></div><div class="menus_item"><a class="site-page" href="/link/"><i class="fa-fw fas fa-link"></i><span> Link</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div><div class="menus_item"><a class="site-page" href="/gallery/"><i class="fa-fw fas fa-gallery"></i><span> Gallery</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">Linear Algebra with pytorch</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">Created</span><time class="post-meta-date-created" datetime="2023-06-02T16:00:00.000Z" title="Created 2023-06-03 00:00:00">2023-06-03</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">Updated</span><time class="post-meta-date-updated" datetime="2023-07-08T16:07:58.650Z" title="Updated 2023-07-09 00:07:58">2023-07-09</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E4%BA%BA%E5%B7%A5%E6%99%BA%E8%83%BD/">人工智能</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="Linear Algebra with pytorch"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">Post View:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h2 id="2-3-1-Scalars"><a href="#2-3-1-Scalars" class="headerlink" title="2.3.1 Scalars"></a>2.3.1 Scalars</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line">x = torch.tensor(<span class="number">3.0</span>)</span><br><span class="line">y = torch.tensor(<span class="number">2.0</span>)</span><br><span class="line"></span><br><span class="line">x + y, x * y, x / y, x ** y</span><br></pre></td></tr></table></figure>
+<pre><code>(tensor(5.), tensor(6.), tensor(1.5000), tensor(9.))
+</code></pre><h2 id="2-3-2-Vectors"><a href="#2-3-2-Vectors" class="headerlink" title="2.3.2 Vectors"></a>2.3.2 Vectors</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = torch.arange(<span class="number">3</span>)</span><br><span class="line">x</span><br><span class="line"><span class="comment">#It will start from 0 to 2.</span></span><br></pre></td></tr></table></figure>
+<pre><code>tensor([0, 1, 2])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">x[<span class="number">2</span>]</span><br><span class="line"><span class="built_in">len</span>(x)</span><br><span class="line">x.shape</span><br><span class="line"><span class="comment">#foundamental operations.</span></span><br></pre></td></tr></table></figure>
+<pre><code>torch.Size([3])
+</code></pre><h2 id="2-3-3-Matrices"><a href="#2-3-3-Matrices" class="headerlink" title="2.3.3 Matrices"></a>2.3.3 Matrices</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A = torch.arange(<span class="number">6</span>).reshape(<span class="number">3</span>, <span class="number">2</span>)</span><br><span class="line">A, A.T</span><br></pre></td></tr></table></figure>
+<pre><code>(tensor([[0, 1],
+         [2, 3],
+         [4, 5]]),
+ tensor([[0, 2, 4],
+         [1, 3, 5]]))
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">A = torch.tensor([[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>], [<span class="number">2</span>, <span class="number">0</span>, <span class="number">4</span>], [<span class="number">3</span>, <span class="number">4</span>, <span class="number">5</span>]])</span><br><span class="line">A == A.T</span><br><span class="line"><span class="comment">#Using bool operation creates identity matrice.</span></span><br></pre></td></tr></table></figure>
+<pre><code>tensor([[True, True, True],
+        [True, True, True],
+        [True, True, True]])
+</code></pre><h2 id="2-3-4-Tensors"><a href="#2-3-4-Tensors" class="headerlink" title="2.3.4 Tensors"></a>2.3.4 Tensors</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">torch.arange(<span class="number">24</span>).reshape(<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>)</span><br></pre></td></tr></table></figure>
+<pre><code>tensor([[[ 0,  1,  2,  3],
+         [ 4,  5,  6,  7],
+         [ 8,  9, 10, 11]],
+
+        [[12, 13, 14, 15],
+         [16, 17, 18, 19],
+         [20, 21, 22, 23]]])
+</code></pre><h2 id="2-3-5-Basic-Properties-of-Tensor-Arithmetic"><a href="#2-3-5-Basic-Properties-of-Tensor-Arithmetic" class="headerlink" title="2.3.5 Basic Properties of Tensor Arithmetic"></a>2.3.5 Basic Properties of Tensor Arithmetic</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">A = torch.arange(<span class="number">6</span>, dtype=torch.float32).reshape(<span class="number">2</span>, <span class="number">3</span>)</span><br><span class="line">B = A.clone()</span><br><span class="line">A, A + B</span><br></pre></td></tr></table></figure>
+<pre><code>(tensor([[0., 1., 2.],
+         [3., 4., 5.]]),
+ tensor([[ 0.,  2.,  4.],
+         [ 6.,  8., 10.]]))
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A * B</span><br><span class="line"><span class="comment">#multiply by element</span></span><br></pre></td></tr></table></figure>
+<pre><code>tensor([[ 0.,  1.,  4.],
+        [ 9., 16., 25.]])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a = <span class="number">2</span></span><br><span class="line">X = torch.arange(<span class="number">24</span>).reshape(<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>)</span><br><span class="line">a + X, (a * X).shape</span><br><span class="line"><span class="comment">#every elememt is added by 2</span></span><br></pre></td></tr></table></figure>
+<pre><code>(tensor([[[ 2,  3,  4,  5],
+          [ 6,  7,  8,  9],
+          [10, 11, 12, 13]],
+
+         [[14, 15, 16, 17],
+          [18, 19, 20, 21],
+          [22, 23, 24, 25]]]),
+ torch.Size([2, 3, 4]))
+</code></pre><h2 id="2-3-6-Reduction"><a href="#2-3-6-Reduction" class="headerlink" title="2.3.6 Reduction"></a>2.3.6 Reduction</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">x = torch.arange(<span class="number">3</span>, dtype=torch.float32)</span><br><span class="line">x, x.<span class="built_in">sum</span>()</span><br><span class="line"><span class="comment">#Note: after sum() we also get the tensor.</span></span><br></pre></td></tr></table></figure>
+<pre><code>(tensor([0., 1., 2.]), tensor(3.))
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A.shape, A.<span class="built_in">sum</span>()</span><br></pre></td></tr></table></figure>
+<pre><code>(torch.Size([2, 3]), tensor(15.))
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A.shape, A.<span class="built_in">sum</span>(axis=<span class="number">0</span>), A.<span class="built_in">sum</span>(axis=<span class="number">0</span>).shape</span><br><span class="line"><span class="comment">#we sum the elements by column.</span></span><br></pre></td></tr></table></figure>
+<pre><code>(torch.Size([2, 3]), tensor([3., 5., 7.]), torch.Size([3]))
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A.<span class="built_in">sum</span>([<span class="number">0</span>, <span class="number">1</span>]) == A.<span class="built_in">sum</span>()</span><br><span class="line"><span class="comment">#We add the result of previous axis=0 and axis=1</span></span><br></pre></td></tr></table></figure>
+<pre><code>tensor(True)
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A.mean(), A.<span class="built_in">sum</span>() / A.numel()</span><br></pre></td></tr></table></figure>
+<pre><code>(tensor(2.5000), tensor(2.5000))
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">A.mean(axis=<span class="number">0</span>), A.<span class="built_in">sum</span>(axis=<span class="number">0</span>) / A.shape[<span class="number">0</span>], A.shape[<span class="number">0</span>]</span><br><span class="line"><span class="comment">#shape[0] represents the first number in [2,3] that is 2.</span></span><br><span class="line"><span class="comment">#axis=0 represents mean of every column, and the result is written as a row, namely row is the director.</span></span><br></pre></td></tr></table></figure>
+<pre><code>(tensor([1.5000, 2.5000, 3.5000]), tensor([1.5000, 2.5000, 3.5000]), 2)
+</code></pre><h2 id="Reduction-without-reducing-dimension"><a href="#Reduction-without-reducing-dimension" class="headerlink" title="Reduction without reducing dimension"></a>Reduction without reducing dimension</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sum_A = A.<span class="built_in">sum</span>(axis=<span class="number">1</span>, keepdims = <span class="literal">True</span>)</span><br><span class="line">sum_A</span><br><span class="line"><span class="comment">#still remain two-deminsion tensor, however the row tensor only has one element.</span></span><br></pre></td></tr></table></figure>
+<pre><code>tensor([[ 3.],
+        [12.]])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A / sum_A</span><br><span class="line"><span class="comment">#due to same dimension, we can use divide broadcasting.</span></span><br></pre></td></tr></table></figure>
+<pre><code>tensor([[0.0000, 0.3333, 0.6667],
+        [0.2500, 0.3333, 0.4167]])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A.cumsum(axis = <span class="number">0</span>)</span><br><span class="line"><span class="comment">#This is cumulation summation</span></span><br></pre></td></tr></table></figure>
+<pre><code>tensor([[0., 1., 2.],
+        [3., 5., 7.]])
+</code></pre><h2 id="2-3-7-dot-production"><a href="#2-3-7-dot-production" class="headerlink" title="2.3.7 dot production"></a>2.3.7 dot production</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">y = torch.ones(<span class="number">3</span>, dtype = torch.float32)</span><br><span class="line"><span class="comment">#this it to generate one by on addtion tensor</span></span><br><span class="line">x, y, torch.dot(x, y)</span><br></pre></td></tr></table></figure>
+<pre><code>(tensor([0., 1., 2.]), tensor([1., 1., 1.]), tensor(3.))
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">torch.<span class="built_in">sum</span>(x * y)</span><br><span class="line"><span class="comment">#This also can be used to represent dot production</span></span><br></pre></td></tr></table></figure>
+<pre><code>tensor(3.)
+</code></pre><h2 id="2-3-8-Matrix-vector-production"><a href="#2-3-8-Matrix-vector-production" class="headerlink" title="2.3.8 Matrix-vector production"></a>2.3.8 Matrix-vector production</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A, A.shape, x.shape, torch.mv(A, x)</span><br><span class="line"><span class="comment">#the result should be column vector but represented by row vector.</span></span><br></pre></td></tr></table></figure>
+<pre><code>(tensor([[0., 1., 2.],
+         [3., 4., 5.]]),
+ torch.Size([2, 3]),
+ torch.Size([3]),
+ tensor([ 5., 14.]))
+</code></pre><h2 id="2-3-9-matrix-matrix-production"><a href="#2-3-9-matrix-matrix-production" class="headerlink" title="2.3.9 matrix-matrix production"></a>2.3.9 matrix-matrix production</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">B = torch.ones(<span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line">torch.mm(A, B)</span><br></pre></td></tr></table></figure>
+<pre><code>tensor([[ 3.,  3.,  3.,  3.],
+        [12., 12., 12., 12.]])
+</code></pre><h2 id="2-3-10-Norm"><a href="#2-3-10-Norm" class="headerlink" title="2.3.10 Norm"></a>2.3.10 Norm</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">u = torch.tensor([<span class="number">3.0</span>, -<span class="number">4.0</span>])</span><br><span class="line">torch.norm(u)</span><br><span class="line"><span class="comment">#This is L2 norm</span></span><br></pre></td></tr></table></figure>
+<pre><code>tensor(5.)
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">torch.<span class="built_in">abs</span>(u).<span class="built_in">sum</span>()</span><br><span class="line"><span class="comment">#L1 norm</span></span><br></pre></td></tr></table></figure>
+<pre><code>tensor(7.)
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">torch.norm(torch.ones((<span class="number">4</span>, <span class="number">9</span>)))</span><br></pre></td></tr></table></figure>
+<pre><code>tensor(6.)
+</code></pre><h2 id="2-3-Homework"><a href="#2-3-Homework" class="headerlink" title="2.3 Homework"></a>2.3 Homework</h2><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A.T.T == A</span><br></pre></td></tr></table></figure>
+<pre><code>tensor([[True, True, True],
+        [True, True, True]])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">A = torch.ones(<span class="number">3</span>, dtype = torch.float32)</span><br><span class="line">B = torch.arange(<span class="number">3</span>, dtype = torch.float32)</span><br><span class="line"></span><br><span class="line">A.T + B.T == (A + B).T</span><br></pre></td></tr></table></figure>
+<pre><code>tensor([True, True, True])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">A = torch.ones(<span class="number">2</span>, <span class="number">2</span>)</span><br><span class="line">A.T == A</span><br><span class="line">A + A.T == A.T + A</span><br></pre></td></tr></table></figure>
+<pre><code>tensor([[True, True],
+        [True, True]])
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A = torch.randn(<span class="number">24</span>, dtype = torch.float32).reshape(<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>)</span><br><span class="line">A, <span class="built_in">len</span>(A), <span class="built_in">len</span>(A[<span class="number">1</span>]), <span class="built_in">len</span>(A[<span class="number">1</span>][<span class="number">1</span>])</span><br></pre></td></tr></table></figure>
+<pre><code>(tensor([[[-0.9297, -0.2415,  1.8647, -0.0205],
+          [ 0.6223, -0.7209, -1.4938,  1.2582],
+          [ 0.2043,  1.3976,  0.7981, -0.3822]],
+
+         [[ 1.1671, -0.1538, -0.1677, -0.2786],
+          [-1.4894, -0.8465,  0.1436, -0.0888],
+          [-2.0312, -2.1697, -0.7590, -0.6403]]]),
+ 2,
+ 3,
+ 4)
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">A = torch.randn(<span class="number">24</span>, dtype=torch.float32).reshape(<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>)</span><br><span class="line">B = torch.tensor([[[<span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>], [<span class="number">5</span>,<span class="number">6</span>,<span class="number">7</span>,<span class="number">8</span>], [<span class="number">9</span>,<span class="number">10</span>,<span class="number">11</span>,<span class="number">12</span>]], [[<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>], [<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>], [<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>,<span class="number">1</span>]]])</span><br><span class="line"><span class="comment">#仔细理解！</span></span><br><span class="line">B.shape, B.<span class="built_in">sum</span>(axis=<span class="number">0</span>), B.<span class="built_in">sum</span>(axis = <span class="number">1</span>), B.<span class="built_in">sum</span>(axis = <span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+<pre><code>(torch.Size([2, 3, 4]),
+ tensor([[ 2,  3,  4,  5],
+         [ 6,  7,  8,  9],
+         [10, 11, 12, 13]]),
+ tensor([[15, 18, 21, 24],
+         [ 3,  3,  3,  3]]),
+ tensor([[10, 26, 42],
+         [ 4,  4,  4]]))
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">B.<span class="built_in">sum</span>(axis=<span class="number">2</span>), B.<span class="built_in">sum</span>(axis=<span class="number">1</span>), B.<span class="built_in">sum</span>(axis=<span class="number">0</span>)</span><br><span class="line"><span class="comment">#Notice: axis=0 is the exterior one, it combine the two matrix, so it is in the third dimension ,</span></span><br><span class="line"><span class="comment">#the dimension is 2 of 2,3,4</span></span><br><span class="line"><span class="comment">#and the output is 3*4</span></span><br><span class="line"><span class="comment">#the same reason, when we use axis=1, the column in each matrix will be summed, so output is 2*4</span></span><br></pre></td></tr></table></figure>
+<pre><code>(tensor([[10, 26, 42],
+         [ 4,  4,  4]]),
+ tensor([[15, 18, 21, 24],
+         [ 3,  3,  3,  3]]),
+ tensor([[ 2,  3,  4,  5],
+         [ 6,  7,  8,  9],
+         [10, 11, 12, 13]]))
+</code></pre><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">torch.norm(torch.ones(<span class="number">4</span>, <span class="number">9</span>))</span><br><span class="line"><span class="comment">#this is 6, is all the elements&#x27; square&#x27;s summation&#x27;s root.</span></span><br></pre></td></tr></table></figure>
+<pre><code>tensor([[1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.],
+        [1., 1., 1., 1., 1., 1., 1., 1., 1.]])
+</code></pre></article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">Author: </span><span class="post-copyright-info"><a href="http://www.mathming.ltd">Spencer</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">Link: </span><span class="post-copyright-info"><a href="http://www.mathming.ltd/2023/06/03/2023-6-3_2.3Linear%20Algebra/">http://www.mathming.ltd/2023/06/03/2023-6-3_2.3Linear%20Algebra/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">Copyright Notice: </span><span class="post-copyright-info">All articles in this blog are licensed under <a target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY-NC-SA 4.0</a> unless stating additionally.</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/">深度学习</a></div><div class="post_share"><div class="social-share" data-image="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><div class="post-reward"><div class="reward-button"><i class="fas fa-qrcode"></i> Donate</div><div class="reward-main"><ul class="reward-all"><li class="reward-item"><a href="/img/wechat.jpg" target="_blank"><img class="post-qr-code-img" src="/img/wechat.jpg" alt="wechat"/></a><div class="post-qr-code-desc">wechat</div></li></ul></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2023/06/04/2023-6-4_2.4calculus/"><img class="prev-cover" src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">Previous Post</div><div class="prev_info">2.4 calculus with pytorch</div></div></a></div><div class="next-post pull-right"><a href="/2023/06/03/2023-6-3-lab-hackthebox-Archetype-windowsRCE/"><img class="next-cover" src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">Next Post</div><div class="next_info">lab-hackthebox-Archetype-windowsRCE</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>Related Articles</span></div><div class="relatedPosts-list"><div><a href="/2023/06/01/2023-6-1_deep_learning_pre_knowledge/" title="deep learning pre knowledge"><img class="cover" src="https://images.pexels.com/photos/1903702/pexels-photo-1903702.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-01</div><div class="title">deep learning pre knowledge</div></div></a></div><div><a href="/2023/06/02/2023-6-2_homework1_preprocess_dataset/" title="homework1 preprocess dataset"><img class="cover" src="https://images.pexels.com/photos/1903702/pexels-photo-1903702.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-02</div><div class="title">homework1 preprocess dataset</div></div></a></div><div><a href="/2023/06/04/2023-6-4_2.4calculus/" title="2.4 calculus with pytorch"><img class="cover" src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-04</div><div class="title">2.4 calculus with pytorch</div></div></a></div><div><a href="/2023/06/05/2023-6-5_2.6%20Probability%20and%20Statistics/" title="2.6 Probability and Statistics"><img class="cover" src="https://i.loli.net/2020/05/01/gkihqEjXxJ5UZ1C.jpg" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-05</div><div class="title">2.6 Probability and Statistics</div></div></a></div><div><a href="/2023/06/06/2023-6-6_3.1%20Linear%20regression/" title="3.1 Linear regression"><img class="cover" src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-06</div><div class="title">3.1 Linear regression</div></div></a></div><div><a href="/2023/06/07/2023-6-7-%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0(1)/" title="深度学习(1)"><img class="cover" src="https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-06-07</div><div class="title">深度学习(1)</div></div></a></div></div></div><hr/><div id="post-comment"><div class="comment-head"><div class="comment-headline"><i class="fas fa-comments fa-fw"></i><span> Comment</span></div><div id="comment-switch"><span class="first-comment">Valine</span><span class="switch-btn"></span><span class="second-comment">Disqus</span></div></div><div class="comment-wrap"><div><div class="vcomment" id="vcomment"></div></div><div><div id="disqus_thread"></div></div></div></div></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>Catalog</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-1-Scalars"><span class="toc-number">1.</span> <span class="toc-text">2.3.1 Scalars</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-2-Vectors"><span class="toc-number">2.</span> <span class="toc-text">2.3.2 Vectors</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-3-Matrices"><span class="toc-number">3.</span> <span class="toc-text">2.3.3 Matrices</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-4-Tensors"><span class="toc-number">4.</span> <span class="toc-text">2.3.4 Tensors</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-5-Basic-Properties-of-Tensor-Arithmetic"><span class="toc-number">5.</span> <span class="toc-text">2.3.5 Basic Properties of Tensor Arithmetic</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-6-Reduction"><span class="toc-number">6.</span> <span class="toc-text">2.3.6 Reduction</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Reduction-without-reducing-dimension"><span class="toc-number">7.</span> <span class="toc-text">Reduction without reducing dimension</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-7-dot-production"><span class="toc-number">8.</span> <span class="toc-text">2.3.7 dot production</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-8-Matrix-vector-production"><span class="toc-number">9.</span> <span class="toc-text">2.3.8 Matrix-vector production</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-9-matrix-matrix-production"><span class="toc-number">10.</span> <span class="toc-text">2.3.9 matrix-matrix production</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-10-Norm"><span class="toc-number">11.</span> <span class="toc-text">2.3.10 Norm</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#2-3-Homework"><span class="toc-number">12.</span> <span class="toc-text">2.3 Homework</span></a></li></ol></div></div></div></div></main><footer id="footer" style="background-image: url('https://images.pexels.com/photos/1509534/pexels-photo-1509534.jpeg?auto=compress&amp;cs=tinysrgb&amp;w=1260&amp;h=750&amp;dpr=1')"><div id="footer-wrap"><div class="copyright">&copy;2020 - 2023 By Spencer</div><div class="framework-info"><span>Framework </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>Theme </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="Read Mode"><i class="fas fa-book-open"></i></button><button id="translateLink" type="button" title="Switch Between Traditional Chinese And Simplified Chinese">繁</button><button id="darkmode" type="button" title="Switch Between Light And Dark Mode"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="Toggle between single-column and double-column"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="Setting"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="Table Of Contents"><i class="fas fa-list-ul"></i></button><button id="chat_btn" type="button" title="Chat"><i class="fas fa-sms"></i></button><a id="to_comment" href="#post-comment" title="Scroll To Comments"><i class="fas fa-comments"></i></a><button id="go-up" type="button" title="Back To Top"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="/js/tw_cn.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><script src="https://cdn.jsdelivr.net/npm/instant.page/instantpage.min.js" type="module"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script><script>function loadValine () {
+  function initValine () {
+    const valine = new Valine(Object.assign({
+      el: '#vcomment',
+      appId: '',
+      appKey: '',
+      avatar: 'monsterid',
+      serverURLs: '',
+      emojiMaps: "",
+      path: window.location.pathname,
+      visitor: false
+    }, null))
+  }
+
+  if (typeof Valine === 'function') initValine() 
+  else getScript('https://cdn.jsdelivr.net/npm/valine/dist/Valine.min.js').then(initValine)
+}
+
+if ('Valine' === 'Valine' || !true) {
+  if (true) btf.loadComment(document.getElementById('vcomment'),loadValine)
+  else setTimeout(loadValine, 0)
+} else {
+  function loadOtherComment () {
+    loadValine()
+  }
+}</script><script>function loadDisqus () {
+  var disqus_config = function () {
+    this.page.url = 'http://www.mathming.ltd/2023/06/03/2023-6-3_2.3Linear%20Algebra/'
+    this.page.identifier = '/2023/06/03/2023-6-3_2.3Linear%20Algebra/'
+    this.page.title = 'Linear Algebra with pytorch'
+  };
+
+  window.disqusReset = () => {
+    DISQUS.reset({
+      reload: true,
+      config: disqus_config
+    })
+  }
+
+  if (window.DISQUS) disqusReset()
+  else {
+    (function() { 
+      var d = document, s = d.createElement('script');
+      s.src = 'https://.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  }
+
+  document.getElementById('darkmode').addEventListener('click', () => {
+    setTimeout(() => window.disqusReset(), 200)
+  })
+}
+
+if ('Valine' === 'Disqus' || !true) {
+  if (true) btf.loadComment(document.getElementById('disqus_thread'), loadDisqus)
+  else loadDisqus()
+} else {
+  function loadOtherComment () {
+    loadDisqus()
+  }
+}
+</script></div><a href="https://beian.miit.gov.cn/" target="_blank" class="is-center">冀ICP备2021024675号-1</a><canvas class="fireworks" mobile="false"></canvas><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/fireworks.min.js"></script><script defer="defer" id="ribbon" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-ribbon.min.js" size="150" alpha="0.6" zIndex="-1" mobile="false" data-click="false"></script><script defer="defer" id="fluttering_ribbon" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-fluttering-ribbon.min.js"></script><script id="canvas_nest" defer="defer" color="0,0,255" opacity="0.7" zIndex="-1" count="99" mobile="false" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/canvas-nest.min.js"></script><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/activate-power-mode.min.js"></script><script>POWERMODE.colorful = true;
+POWERMODE.shake = true;
+POWERMODE.mobile = false;
+document.body.addEventListener('input', POWERMODE);
+</script><script id="click-show-text" src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/dist/click-show-text.min.js" data-mobile="false" data-text="I,LOVE,YOU" data-fontsize="15px" data-random="true" async="async"></script><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
